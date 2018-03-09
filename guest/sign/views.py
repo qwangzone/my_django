@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from sign.models import Event, Guest
 # Create your views here.
-
 def index(request):
     return render(request, "index.html")
 
@@ -32,4 +32,33 @@ def login_action(request):
 def event_manager(request):
     #username = request.COOKIES.get('user') #获取cookies
     username = request.session.get('user') # 获取session
-    return render(request, 'event_manager.html', {'user': username})
+    event_list = Event.objects.all()
+    return render(request, 'event_manager1.html', {'user': username,
+                                                  'events': event_list})
+@login_required()
+def searchevent_manager(request):
+    event_name = request.GET.get('event_name')
+    if event_name is None:
+        event_list = Event.objects.all()
+    else:
+        event_list = Event.objects.filter(name__contains=event_name)
+    username = request.session.get('user')
+
+    return render(request, 'event_manager1.html', {'events': event_list,
+                                                  'user': username})
+@login_required()
+def guest_manager(request):
+    guest_list = Guest.objects.all()
+    #event_list = Event.objects.all()
+    return render(request, 'guest_manager.html', {'guests': guest_list})
+@login_required()
+def searchguest_manager(request):
+    guest_name = request.GET.get('guest_name')
+    if guest_name is None:
+        guest_list = Guest.objects.all()
+    else:
+        guest_list = Guest.objects.filter(realname__contains=guest_name)
+    username = request.session.get('user')
+
+    return render(request, 'guest_manager.html', {'guests': guest_list,
+                                                   'user': username})
