@@ -35,7 +35,7 @@
         <input type="submit" value="搜索">
     </form>
 </div>
-<!--发布会列表页-->
+<!--嘉宾列表页-->
 <div class="row" style="padding-top: 80px;">
     <!-- Default panel contents -->
     <!--<div class="panel-heading">Panel heading</div>-->
@@ -47,7 +47,12 @@
     <table class="table  table-striped" style="margin-left:20px;">
         <thead>
         <tr>
-            <th>id</th><th>姓名</th><th>状态</th><th>电话</th><th>签到时间</th><th>发布会</th>
+            <th>id</th>
+            <th>姓名</th>
+            <th>状态</th>
+            <th>电话</th>
+            <th>签到时间</th>
+            <th>发布会</th>
         </tr>
         </thead>
         <tbody>
@@ -56,9 +61,9 @@
             <td>{{guest.id}}</td>
             <td>{{guest.realname}}</td>
             {% if guest.status is True%}
-            <td>已报名</td>
+            <td>未签</td>
             {% else %}
-            <td>未参加</td>
+            <td>已签到</td>
             {% endif %}
             <td>{{guest.phone}}</td>
             <td>{{guest.create_time|date:'Y-m-d H:i:s'}}</td>
@@ -67,6 +72,20 @@
         {% endfor %}
         </tbody>
     </table>
+</div>
+<!--列表分页器-->
+<div class="pagination" style="padding-left:1600px;">
+<span class="step-links">
+{% if guests.has_previous %}
+<a href="?page={{ guests.previous_page_number }}">上一页</a>
+{% endif %}
+<span class="current">
+第{{ guests.number }} 页&nbsp&nbsp&nbsp&nbsp共{{ guests.paginator.num_pages }}页.
+</span>
+{% if guests.has_next %}
+<a href="?page={{ guests.next_page_number }}">下一页</a>
+{% endif %}
+</span>
 </div>
 </body>
 </html>
