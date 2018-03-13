@@ -31,13 +31,16 @@ def login_action(request):
             return response
         else:
             return render(request, "index.html", {'error': '用户名或密码错误'})
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect('/index/')
 @login_required()
 def event_manager(request):
     #username = request.COOKIES.get('user') #获取cookies
     username = request.session.get('user') # 获取session
     event_list = Event.objects.all()
     page = request.GET.get('page')
-    paginator = Paginator(event_list, 1)
+    paginator = Paginator(event_list, 10)
     try:
         contacts = paginator.page(page)
     except PageNotAnInteger:
@@ -54,7 +57,7 @@ def searchevent_manager(request):
     else:
         event_list = Event.objects.filter(name__contains=event_name)
     username = request.session.get('user')
-    paginator = Paginator(event_list, 1)
+    paginator = Paginator(event_list, 10)
     page = request.GET.get('page')
     try:
         contacts = paginator.page(page)
@@ -68,7 +71,7 @@ def searchevent_manager(request):
 @login_required()
 def guest_manager(request):
     guest_list = Guest.objects.all()
-    paginator = Paginator(guest_list, 1)
+    paginator = Paginator(guest_list, 10)
     page = request.GET.get('page')
     try:
         contacts = paginator.page(page)
@@ -81,13 +84,15 @@ def guest_manager(request):
 @login_required()
 def searchguest_manager(request):
     guest_name = request.GET.get('guest_name')
+    #guest_list = Guest.objects.get(realname=guest_name)
+    #guest_list = get_object_or_404(Guest, realname=guest_name)
     if guest_name is None:
         guest_list = Guest.objects.all()
 
     else:
         guest_list = Guest.objects.filter(realname__contains=guest_name)
     username = request.session.get('user')
-    paginator = Paginator(guest_list, 1)
+    paginator = Paginator(guest_list, 10)
     page = request.GET.get('page')
     try:
         contacts = paginator.page(page)
@@ -126,4 +131,23 @@ def sign_index_action(request, event_id):
         Guest.objects.filter(phone=phone, event_id=event_id).update(sign='1')
         return render(request, 'sign_index.html', {'event': event,
                                                    'hint': 'sign in success!',
-                                                   'guest': result})
+                                                 'guest': result})
+@login_required()
+def add_guest(request):
+    event_list = Event.objects.all()
+    return render(request, 'register.html', {'events': event_list})
+
+@login_required()
+def add_guest_submit(request):
+    realname = request.POST.get('realname')
+    phone = request.POST.get('phone')
+    email = request.POST.get('email')
+    event_name = request.POST.get('event_name')
+    print("==============" + event_name)
+    event_id = Event.objects.get(name=event_name).id
+    Guest.objects.create(realname=realname, phone=phone, email=email, event_id=event_id, sign=False)
+    guest_list = Guest.objects.all()
+    return HttpResponseRedirect('/guest_manage/')
+
+
+

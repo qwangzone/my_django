@@ -32,8 +32,9 @@
 <div class="row" style="padding-top: 80px;margin-left:10px;">
     <form method="get" action="guest_name">
         <input type="text" placeholder="嘉宾姓名" name="guest_name">
-        <input type="submit" value="搜索">
+        <input type="submit" value="搜索"><a href="/add_guest/"><h4>添加嘉宾</h4></a>
     </form>
+
 </div>
 <!--嘉宾列表页-->
 <div class="row" style="padding-top: 80px;">
@@ -61,7 +62,7 @@
             <td>{{guest.id}}</td>
             <td>{{guest.realname}}</td>
             {% if guest.status is True%}
-            <td>未签</td>
+            <td>未签到</td>
             {% else %}
             <td>已签到</td>
             {% endif %}
