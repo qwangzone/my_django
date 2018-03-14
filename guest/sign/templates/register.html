@@ -2,25 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>登记页</title>
+    <title>注册</title>
 </head>
 <body>
-<h1>发布会管理系统登记</h1>
-<form method="post" action="/add_guest_submit/">
-    姓名：<input name="realname" type="text" placeholder="姓名"> <br>
-    电话：<input name="phone" type="text" placeholder="phone"> <br>
-    邮箱：<input name="email" type="text" placeholder="email"> <br>
-    <select name="event_name">
-        {%for event in events%}
-        <option value="{{event}}">{{event}}</option>
-        <!--<option value="2">{{event}}</option>-->
-        <!--<option value="3">{{event}}</option>-->
-        {%endfor%}
-    </select> <br>
-    <button id="btn" type="submit">添加</button> <br>
+<h1>发布会管理系统注册</h1>
+<form method="post" action="/register/">
+    <input name="username" type="text" placeholder="username"> <br>
+    <input name="phone" type="text" placeholder="phone"> <br>
+    <input name="password" type="password" placeholder="password"> <br>
+    <input name="password_conf" type="password" placeholder="password_conf"> <br>
+    <input name="email" type="text" placeholder="email"> <br>
+    <button id="btn" type="submit">注册</button> <br>
     {{ error }}
     {% csrf_token %}
-</form>
-
 </body>
 </html>

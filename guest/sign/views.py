@@ -3,8 +3,9 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from sign.models import Event, Guest
+from sign.models import Event, Guest, User
 from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
+from django import forms
 # Create your views here.
 def index(request):
     return render(request, "index.html")
@@ -141,7 +142,7 @@ def sign_index_action(request, event_id):
 @login_required()
 def add_guest(request):
     event_list = Event.objects.all()
-    return render(request, 'register.html', {'events': event_list})
+    return render(request, 'add_guest.html', {'events': event_list})
 
 @login_required()
 def add_guest_submit(request):
@@ -168,10 +169,25 @@ def event_guest(request, event_id):
 def register_user(request):
     if request.method == "POST":
         username = request.POST.get('username', '')
+        phone = request.POST.get('phone', '')
         password = request.POST.get('password', '')
         password_conf = request.POST.get('password_conf', '')
         email = request.POST.get('email', '')
-        registerForm = Regi
+        if password != password_conf:
+            return render(request, "register.html", {'error': '两次密码输入不一致'})
+        user = User.objects.get(phone=phone)
+        if user:
+            return render(request, "register.html", {'error': '该用户已注册可直接登录'})
+        else:
+            User.objects.create(username=username, password=password, phone=phone, email=email)
+            return HttpResponse('注册成功')
+
+
+def register(request):
+    return render(request, 'register.html')
+
+
+
 
 
 

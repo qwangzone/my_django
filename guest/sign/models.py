@@ -27,4 +27,5 @@ class Guest(models.Model):
 class User(models.Model):
     username = models.CharField(max_length=50)
     password = models.CharField(max_length=50)
+    phone = models.CharField(max_length=16)
     email = models.EmailField()
