@@ -7,7 +7,16 @@
     <meta charset="UTF-8">
     <title>Guest Manager Page</title>
     <script>
-        fucn
+        function confirm_function(){
+        var cf = confirm('确认删除吗！')
+        if (cf){
+        window.location.href="/delete_guest/{{guest.id}}/"
+        }
+        else{
+        window.location.href="/guest_manage/"
+        }
+}
+
     </script>
 </head>
 <body>
@@ -65,15 +74,30 @@
         <tr>
             <td>{{guest.id}}</td>
             <td>{{guest.realname}}</td>
-            {% if guest.status is True%}
-            <td>未签到</td>
-            {% else %}
+            {% if guest.sign is True%}
             <td>已签到</td>
+            {% else %}
+            <td>未签到</td>
             {% endif %}
             <td>{{guest.phone}}</td>
             <td>{{guest.create_time|date:'Y-m-d H:i:s'}}</td>
             <td>{{guest.event}}</td>
-            <td><a href="#####">删除</a></td>
+            <!--<td><a href="/delete_guest/{{guest.id}}">删除</a></td>-->
+
+            <script>
+                function confirm_function(){
+                var cf = confirm('确认删除吗！')
+                if (cf){
+                window.location.href="/delete_guest/{{guest.id}}"
+                }
+                else{
+                window.location.href="/guest_manage/"
+                }
+                    }
+
+
+            </script>
+            <td><button onclick="confirm_function()">删除</button></td>
         </tr>
         {% endfor %}
         </tbody>

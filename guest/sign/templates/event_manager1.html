@@ -55,7 +55,7 @@
         {% for event in events %}
         <tr>
             <td>{{event.id}}</td>
-            <td>{{event.name}}</td>
+            <td><a href="/event_guest/{{event.id}}">{{event.name}}</a></td>
             {% if event.status is True%}
             <td>可参加</td>
             {% else %}

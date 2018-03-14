@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^sign_index/(?P<event_id>[0-9]+)/$', views.sign_index),
     url(r'^sign_index_action/(?P<event_id>[0-9]+)/$', views.sign_index_action),
     url(r'^add_guest/$', views.add_guest),
-    url(r'^add_guest_submit/$', views.add_guest_submit)
+    url(r'^add_guest_submit/$', views.add_guest_submit),
+    url(r'^delete_guest/(?P<guest_id>[0-9]+)$', views.delete_guest),
+    url(r'^event_guest/(?P<event_id>[0-9]+)$', views.event_guest),
 
 ]
