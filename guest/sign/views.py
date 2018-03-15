@@ -175,7 +175,7 @@ def register_user(request):
         email = request.POST.get('email', '')
         if password != password_conf:
             return render(request, "register.html", {'error': '两次密码输入不一致'})
-        user = User.objects.get(phone=phone)
+        user = User.objects.filter(phone=phone)
         if user:
             return render(request, "register.html", {'error': '该用户已注册可直接登录'})
         else:

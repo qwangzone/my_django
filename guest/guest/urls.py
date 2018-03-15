@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from sign import views
+from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -35,6 +36,8 @@ urlpatterns = [
     url(r'^delete_guest/(?P<guest_id>[0-9]+)$', views.delete_guest),
     url(r'^event_guest/(?P<event_id>[0-9]+)$', views.event_guest),
     url(r'^register/$', views.register_user),
-    url(r'^register_go/$', views.register),
+
+    #不通过view视图直接跳转html
+    url(r'^register_go/$', TemplateView.as_view(template_name='register.html')),
 
 ]
