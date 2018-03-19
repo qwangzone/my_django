@@ -1,6 +1,7 @@
 from django.test import TestCase
 from sign.models import Event, Guest
 from django.contrib.auth.models import User
+from datetime import datetime
 
 # Create your tests here.
 class ModelTest(TestCase):
@@ -44,4 +45,32 @@ class TestLoginAction(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('用户名或密码错误'.encode('utf-8'), response.content)
 
+    def test_login_action_username_password_error(self):
+        '''用户名密码错误'''
+        test_data = {'username': 'admin12', 'password': '123'}
+        response = self.client.post('/login_action/', data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('用户名或密码错误'.encode('utf-8'), response.content)
+
+    def tear_login_action_success(self):
+        '''登录成功'''
+        test_data = {'username': 'admin', 'password': 'admin123456'}
+        response = self.client.post("/login_action/", data=test_data)
+        print(response.status_code)
+        self.assertEqual(response.status_code, 302)
+
+class EventManagerTest(TestCase):
+    '''发布会管理'''
+
+    def setUp(self):
+        Event.objects.create(id=2, name="xiaomi5", limit=2000, status=True,
+                             address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
+        User.objects.create_user('admin', 'admin@qq.com', 'admin123456')
+        self.client.post("/login_action/", {'username': 'admin', 'password': 'admin123456'})
+
+    def test_event_manager_success(self):
+        '''测试发布会：xiaomi5'''
+        response = self.client.post('/event_manager/')
+        #self.assertEqual(response.status_code, 200)
+        self.assertIn(b"xiaomi5", response.content)
 
