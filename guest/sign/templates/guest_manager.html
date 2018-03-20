@@ -75,9 +75,9 @@
             <td>{{guest.id}}</td>
             <td>{{guest.realname}}</td>
             {% if guest.sign is True%}
-            <td>已签到</td>
-            {% else %}
             <td>未签到</td>
+            {% else %}
+            <td>已签到</td>
             {% endif %}
             <td>{{guest.phone}}</td>
             <td>{{guest.create_time|date:'Y-m-d H:i:s'}}</td>
