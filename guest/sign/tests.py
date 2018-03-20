@@ -65,12 +65,99 @@ class EventManagerTest(TestCase):
     def setUp(self):
         Event.objects.create(id=2, name="xiaomi5", limit=2000, status=True,
                              address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
+        Event.objects.create(id=3, name="xiaomi6", limit=2000, status=True,
+                             address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
         User.objects.create_user('admin', 'admin@qq.com', 'admin123456')
         self.client.post("/login_action/", {'username': 'admin', 'password': 'admin123456'})
 
     def test_event_manager_success(self):
         '''测试发布会：xiaomi5'''
-        response = self.client.post('/event_manager/')
-        #self.assertEqual(response.status_code, 200)
-        self.assertIn(b"xiaomi5", response.content)
+        response = self.client.get('/event_manager/') #post 与get都可以，重要的是先登录
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"xiaomi6", response.content)
+
+    def test_event_manager_search_success(self):
+        '''测试发布会搜索成功:模糊搜索'''
+        test_data = {'event_name': 'xiaomi'}
+        response = self.client.get('/event_manager/event_name/', data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'xiaomi5', response.content)
+        self.assertIn(b'xiaomi6', response.content)
+
+    def test_event_manager_search_success1(self):
+        '''测试发布会搜索：搜索条件为空'''
+        #test_data = {{'event_name': ''}}
+        response = self.client.get('/event_manager/event_name/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'xiaomi5', response.content)
+        self.assertIn(b'xiaomi6', response.content)
+
+    def test_event_manager_search_success2(self):
+        '''测试发布会搜索:精确搜索'''
+        test_data = {'event_name': 'xiaomi5'}
+        response = self.client.get('/event_manager/event_name/', data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'xiaomi5', response.content)
+        self.assertNotIn(b'xiaomi6', response.content)
+
+    def test_event_manager_search_fail(self):
+        '''测试发布会搜索：查询数据为空'''
+        test_data = {'event_name': 'xiaomi51'}
+        response = self.client.get('/event_manager/event_name/', data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(b'xiaomi5', response.content)
+        self.assertNotIn(b'xiaomi6', response.content)
+
+class GuestManagerTest(TestCase):
+    '''发布会嘉宾'''
+    def setUp(self):
+        Event.objects.create(id=2, name="xiaomi5", limit=2000, status=True,
+                             address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
+        Guest.objects.create(id=1, realname='lucy', phone='110', email='john@qq.com',
+                             sign=False, event_id=2)
+        Guest.objects.create(id=2, realname='lucy1', phone='112', email='lucy@qq.com',
+                             sign=True, event_id=2)
+
+        User.objects.create_user('admin', 'admin@qq.com', 'admin123456')
+        self.client.post('/login_action', {'username': 'admin', 'password': 'admin123456'})
+
+    def test_guest_manger_success(self):
+        '''测试发布会嘉宾'''
+        response = self.client.get('/guest_manage/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'lucy', response.content)
+       # self.assertIn(b'lucy1', response.content)
+
+    def test_guest_manager_search_success(self):
+        '''测试发布会嘉宾搜索:模糊搜索'''
+        test_data = {'guest_name': 'lucy'}
+        response = self.client.get('/guest_manage/guest_name/', data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'lucy', response.content)
+        self.assertIn(b'lucy1', response.content)
+
+    def test_guest_manager_search_success1(self):
+        '''测试发布会嘉宾搜索：搜索条件为空'''
+        #test_data = {{'event_name': ''}}
+        response = self.client.get('/guest_manage/guest_name/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'lucy', response.content)
+        self.assertIn(b'lucy1', response.content)
+
+    def test_guest_manager_search_success2(self):
+        '''测试发布会嘉宾搜索:精确搜索'''
+        test_data = {'guest_name': 'lucy1'}
+        response = self.client.get('/guest_manage/guest_name/', data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'lucy1', response.content)
+        self.assertNotIn(b'lucy', response.content)
+
+    def test_guest_manager_search_fail(self):
+        '''测试发布会嘉宾搜索：查询数据为空'''
+        test_data = {'guest_name': 'lucy2'}
+        response = self.client.get('/guest_manage/guest_name/', data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(b'lucy', response.content)
+        self.assertNotIn(b'lucy1', response.content)
+
 

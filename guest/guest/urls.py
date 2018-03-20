@@ -27,7 +27,7 @@ urlpatterns = [
     url(r'^accounts/login/$', views.index),
     url(r'^event_manager/event_name/', views.searchevent_manager),
     url(r'^guest_manage/$', views.guest_manager),
-    url(r'^guest_mrranage/guest_name', views.searchguest_manager),
+    url(r'^guest_manage/guest_name', views.searchguest_manager),
     url(r'^logout/', views.logout),
     url(r'^sign_index/(?P<event_id>[0-9]+)/$', views.sign_index),
     url(r'^sign_index_action/(?P<event_id>[0-9]+)/$', views.sign_index_action),
