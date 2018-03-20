@@ -115,18 +115,18 @@ class GuestManagerTest(TestCase):
                              address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
         Guest.objects.create(id=1, realname='lucy', phone='110', email='john@qq.com',
                              sign=False, event_id=2)
-        Guest.objects.create(id=2, realname='lucy1', phone='112', email='lucy@qq.com',
+        Guest.objects.create(id=2, realname='lili', phone='112', email='lucy@qq.com',
                              sign=True, event_id=2)
 
         User.objects.create_user('admin', 'admin@qq.com', 'admin123456')
-        self.client.post('/login_action', {'username': 'admin', 'password': 'admin123456'})
+        self.client.post('/login_action/', {'username': 'admin', 'password': 'admin123456'})
 
     def test_guest_manger_success(self):
         '''测试发布会嘉宾'''
         response = self.client.get('/guest_manage/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'lucy', response.content)
-       # self.assertIn(b'lucy1', response.content)
+        self.assertIn(b'lili', response.content)
 
     def test_guest_manager_search_success(self):
         '''测试发布会嘉宾搜索:模糊搜索'''
@@ -134,7 +134,7 @@ class GuestManagerTest(TestCase):
         response = self.client.get('/guest_manage/guest_name/', data=test_data)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'lucy', response.content)
-        self.assertIn(b'lucy1', response.content)
+        self.assertNotIn(b'lili', response.content)
 
     def test_guest_manager_search_success1(self):
         '''测试发布会嘉宾搜索：搜索条件为空'''
@@ -142,15 +142,15 @@ class GuestManagerTest(TestCase):
         response = self.client.get('/guest_manage/guest_name/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'lucy', response.content)
-        self.assertIn(b'lucy1', response.content)
+        self.assertIn(b'lili', response.content)
 
     def test_guest_manager_search_success2(self):
         '''测试发布会嘉宾搜索:精确搜索'''
-        test_data = {'guest_name': 'lucy1'}
+        test_data = {'guest_name': 'lucy'}
         response = self.client.get('/guest_manage/guest_name/', data=test_data)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'lucy1', response.content)
-        self.assertNotIn(b'lucy', response.content)
+        self.assertIn(b'lucy', response.content)
+        self.assertNotIn(b'lili', response.content)
 
     def test_guest_manager_search_fail(self):
         '''测试发布会嘉宾搜索：查询数据为空'''
@@ -158,6 +158,28 @@ class GuestManagerTest(TestCase):
         response = self.client.get('/guest_manage/guest_name/', data=test_data)
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(b'lucy', response.content)
-        self.assertNotIn(b'lucy1', response.content)
+        self.assertNotIn(b'lili', response.content)
 
 
+class UserSignTest(TestCase):
+    '''嘉宾签到测试'''
+    def setUp(self):
+        Event.objects.create(id=1, name="xiaomi5", limit=2000, status=True,
+                             address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
+        Event.objects.create(id=2, name="xiaomi6", limit=2000, status=False,
+                             address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
+        Guest.objects.create(id=1, realname='lucy', phone='110', email='john@qq.com',
+                             sign=False, event_id=1)
+        Guest.objects.create(id=2, realname='lili', phone='112', email='lucy@qq.com',
+                             sign=True, event_id=2)
+
+        User.objects.create_user('admin', 'admin@qq.com', 'admin123456')
+        self.client.post('/login_action/', {'username': 'admin', 'password': 'admin123456'})
+
+    def test_guest_sign_fail1(self):
+        '''测试发布会签到：发布会已结束'''
+        test_data = {'phone': '112'}
+        event_id = 2
+        response = self.client.get('/sign_index_action/%s/' % event_id, data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'event is end.', response.content)
