@@ -72,7 +72,8 @@ class EventManagerTest(TestCase):
 
     def test_event_manager_success(self):
         '''测试发布会：xiaomi5'''
-        response = self.client.get('/event_manager/') #post 与get都可以，重要的是先登录
+        # post 与get要根据方法中使用的方式来用，若测试的模块中用的是get，那么这得用get传参，反之亦然。
+        response = self.client.get('/event_manager/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"xiaomi6", response.content)
 
@@ -123,7 +124,7 @@ class GuestManagerTest(TestCase):
 
     def test_guest_manger_success(self):
         '''测试发布会嘉宾'''
-        response = self.client.get('/guest_manage/')
+        response = self.client.post('/guest_manage/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'lucy', response.content)
         self.assertIn(b'lili', response.content)
@@ -168,10 +169,14 @@ class UserSignTest(TestCase):
                              address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
         Event.objects.create(id=2, name="xiaomi6", limit=2000, status=False,
                              address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
+        Event.objects.create(id=3, name="xiaomi7", limit=2000, status=True,
+                             address="beijing", start_time=datetime(2016, 8, 10, 14, 0, 0))
         Guest.objects.create(id=1, realname='lucy', phone='110', email='john@qq.com',
                              sign=False, event_id=1)
         Guest.objects.create(id=2, realname='lili', phone='112', email='lucy@qq.com',
                              sign=True, event_id=2)
+        Guest.objects.create(id=3, realname='lilei', phone='113', email='lucy@qq.com',
+                             sign=True, event_id=3)
 
         User.objects.create_user('admin', 'admin@qq.com', 'admin123456')
         self.client.post('/login_action/', {'username': 'admin', 'password': 'admin123456'})
@@ -180,6 +185,39 @@ class UserSignTest(TestCase):
         '''测试发布会签到：发布会已结束'''
         test_data = {'phone': '112'}
         event_id = 2
-        response = self.client.get('/sign_index_action/%s/' % event_id, data=test_data)
+        response = self.client.post('/sign_index_action/%s/' %event_id, data=test_data)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'event is end.', response.content)
+
+    def test_guest_sign_fail2(self):
+        '''测试发布会签到：输入不存在的手机号'''
+        test_data = {'phone': '158'}
+        event_id = 1
+        response = self.client.post('/sign_index_action/%s/' %event_id, data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'phone error.', response.content)
+
+    def test_guest_sign_fail3(self):
+        '''测试发布会签到:输入的手机与发布会不匹配'''
+        test_data = {'phone': '112'}
+        event_id = 1
+        response = self.client.post('/sign_index_action/%s/' % event_id, data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'event id or phone error.', response.content)
+
+    def test_guest_sign_fail4(self):
+        '''测试发布会签到：手机号已签到'''
+        test_data = {'phone': '110'}
+        event_id = 1
+        response = self.client.post('/sign_index_action/%s/' % event_id, data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'user has sign in.', response.content)
+
+    def test_guest_sign_success(self):
+        '''测试发布会签到：签到成功'''
+        test_data = {'phone': '113'}
+        event_id = 3
+        response = self.client.post('/sign_index_action/%s/' % event_id, data=test_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'sign in success!', response.content)
+

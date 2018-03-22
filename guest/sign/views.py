@@ -119,7 +119,7 @@ def sign_index_action(request, event_id):
     if event.status is False:
         return render(request, 'sign_index.html', {'event': event,
                                                    'hint': 'event is end.'})
-    result = Guest.objects.get(phone=phone)
+    result = Guest.objects.filter(phone=phone)
     if not result:
         return render(request, 'sign_index.html', {'event': event,
                                                    'hint': 'phone error.'})
