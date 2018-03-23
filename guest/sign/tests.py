@@ -2,6 +2,8 @@ from django.test import TestCase
 from sign.models import Event, Guest
 from django.contrib.auth.models import User
 from datetime import datetime
+from parameterized import parameterized
+import unittest
 
 # Create your tests here.
 class ModelTest(TestCase):
@@ -180,6 +182,19 @@ class UserSignTest(TestCase):
 
         User.objects.create_user('admin', 'admin@qq.com', 'admin123456')
         self.client.post('/login_action/', {'username': 'admin', 'password': 'admin123456'})
+
+    # @parameterized.expand([('event_end', '112', '2', 200, b'event is end.'),
+    #                        ('phone_error', '158', '1', 200, b'phone error.'),
+    #                        ('event_phone_nomatch', '112', '1', 200, b'event id or phone error.'),
+    #                        ('user_signed', '110', '1', 200, b'user has sign in.'),
+    #                        ('sign_success', '113', '3', 200, b'sign in success!')])
+    # def test_guest_sign(self, name, phone, event_id, status_code, result):
+    #     '''测试发布会签到'''
+    #     test_data = {'phone', phone}
+    #     event_id = event_id
+    #     response = self.client.post('/sign_index_action/%s/' % event_id, data=test_data)
+    #     self.assertEqual(response.status_code, status_code)
+    #     self.assertIn(result, response.content)
 
     def test_guest_sign_fail1(self):
         '''测试发布会签到：发布会已结束'''
