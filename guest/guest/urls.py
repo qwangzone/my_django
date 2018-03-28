@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from sign import views
+from sign import views, views_if
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -39,5 +39,6 @@ urlpatterns = [
 
     #不通过view视图直接跳转html
     url(r'^register_go/$', TemplateView.as_view(template_name='register.html')),
+    url(r'^add_event/$', views_if.add_event),
 
 ]
