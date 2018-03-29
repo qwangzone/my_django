@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from sign import views, views_if
 from django.views.generic import TemplateView
@@ -39,6 +39,6 @@ urlpatterns = [
 
     #不通过view视图直接跳转html
     url(r'^register_go/$', TemplateView.as_view(template_name='register.html')),
-    url(r'^add_event/$', views_if.add_event),
+    url(r'^api/', include('sign.urls')),
 
 ]
