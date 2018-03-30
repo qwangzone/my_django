@@ -1,7 +1,8 @@
 from django.http import JsonResponse
-from sign.models import Event
+from sign.models import Event, Guest
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-import json
+from django.db.utils import  IntegrityError
+from datetime import datetime
 #添加发布会接口
 def add_event(request):
     eid = request.POST.get('eid', '')
@@ -14,7 +15,7 @@ def add_event(request):
         return JsonResponse({'status': 10021, 'message': 'parameter error'})
     result = Event.objects.filter(eid=eid)
     if result:
-        return JsonResponse({'status': 10022, 'message': 'event id already exists'})
+        return JsonResponse({'status': 10022, 'm    essage': 'event id already exists'})
     result = Event.objects.filter(name=name)
     if result:
         return JsonResponse({'status': 10023, 'message': 'event name already exists'})
@@ -26,7 +27,7 @@ def add_event(request):
         error = 'start_time format error. it must be in YYYY-MM-DD HH:MM:SS format.'
         return JsonResponse({'status': 10024, 'message': error})
 
-#添加发布会查询接口
+#发布会查询接口
 def get_event_list(request):
     eid = request.GET.get('eid', '')
     name = request.GET.get('name', '')
@@ -63,3 +64,42 @@ def get_event_list(request):
             return JsonResponse({'status': 200, 'message': 'success', 'data': data})
         else:
             return JsonResponse({'status': 10022, 'message': 'query result is empty'})
+
+#添加嘉宾
+def add_guest(request):
+    eid = request.POST.get('eid', '')
+    realname = request.POST.get('realname', '')
+    phone = request.POST.get('phone', '')
+    email = request.POST.get('email', '')
+    if eid == '' or realname == '' or phone == '':
+        print(eid)
+        return JsonResponse({'status': 10021, 'message': 'parameter error'})
+    result = Event.objects.filter(id=eid)
+    if not result:
+        return JsonResponse({'status': 10022, 'message': 'event id null'})
+    result = Event.objects.get(id=eid).status
+    if not result:
+        return JsonResponse({'status': 10023, 'message': 'event status is not available'})
+    event_limit = Event.objects.get(id=eid).limit
+    guest_num = Guest.objects.filter(event_id=eid)
+
+    if event_limit < len(guest_num):
+        return JsonResponse({'status': 10024, 'message': 'event limit is full'})
+
+    event_time = Event.objects.get(id=eid).start_time
+    e_time = event_time.timestamp() #发布会时间
+    n_time = datetime.now().timestamp() #当前时间
+    print(e_time)
+    print(n_time)
+    if e_time > n_time:
+        return JsonResponse({'status': 10025, 'message': 'event has started'})
+
+    try:
+        Guest.objects.create(realname=realname, event_id=eid, phone=phone, email=email, sign=1)
+
+    except IntegrityError:
+        return JsonResponse({'status': 10026, 'message': 'the event guest phone number repeat'})
+
+    else:
+        return JsonResponse({'status': 200, 'message': 'add guest success'})
+
