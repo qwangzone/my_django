@@ -49,11 +49,10 @@ class DB:
 
 if __name__ == '__main__':
     a = DB()
-    data_guest = {'realname': 'jack', 'phone': '123212312', 'email': '09@09.com', 'sign': 1,
-                  'event_id': 1}
-    a.insert('sign_guest', data_guest)
+    data_guest = {'name': 'apd', 'limit': '2222', 'address': 'wqwq', 'status': 1}
+    a.insert('sign_event', data_guest)
     a.close()
-    # ALTER TABLE  `sign_event` CHANGE  `create_time`  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    # ALTER TABLE  `sign_event` CHANGE  `start_time`  `start_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     # ALTER TABLE  `sign_guest` CHANGE  `create_time`  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 
 
