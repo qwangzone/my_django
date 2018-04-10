@@ -1,10 +1,33 @@
+from django.contrib import auth as django_auth
+import hashlib, base64
 from django.http import JsonResponse
 from sign.models import Event, Guest
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.utils import  IntegrityError
 from datetime import datetime
+#用户认证
+def user_auth(request):
+    get_http_auth = request.META.get('HTTP_AUTHORIZATION', b'')
+    auth = get_http_auth.split()
+    try:
+        auth_parts = base64.b64decode(auth[1]).decode('iso-8859-1').partition(':')
+    except IndexError:
+        return 'null'
+    userid, password = auth_parts[0], auth_parts[2]
+    user = django_auth.authenticate(username=userid, password=password)
+    if user is not None and user.is_active:
+        django_auth.login(request, user)
+        return 'success'
+    else:
+        return 'fail'
+
 #添加发布会接口
 def add_event(request):
+    auth_result = user_auth(request)
+    if auth_result == 'null':
+        return JsonResponse({'status': 10011, 'message': 'user auth is null'})
+    elif auth_result == 'fail':
+        return JsonResponse({'status': 10012, 'message': 'user auth is wrong'})
     eid = request.POST.get('eid', '')
     name = request.POST.get('name', '')
     limit = request.POST.get('limit', '')
@@ -33,10 +56,16 @@ def add_event(request):
 
 #发布会查询接口
 def get_event_list(request):
+    print("===========================")
+    auth_result = user_auth(request)
+    if auth_result == 'null':
+        return JsonResponse({'status': 10011, 'message': 'user auth is null'})
+    elif auth_result == 'fail':
+        return JsonResponse({'status': 10012, 'message': 'user auth is wrong'})
     eid = request.GET.get('eid', '')
     name = request.GET.get('name', '')
     if eid == '' and name == '':
-        return JsonResponse({'status': 10021, 'message': 'parameter error'})
+        return JsonResponse({'status': 10021, 'message': 'parameter22 error'})
     if eid != '':
         event = {}
         try:
