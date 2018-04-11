@@ -4,7 +4,7 @@ dir = os.path.dirname(__file__)
 sys.path.append(dir)
 import unittest
 from db_fixture import test_data
-start_dir = dir + "/interface"
+start_dir = dir + "/interface_sec"
 print(start_dir)
 discover = unittest.defaultTestLoader.discover(start_dir=start_dir, pattern='*_test.py')
 if __name__ == '__main__':

@@ -21,8 +21,47 @@ def user_auth(request):
     else:
         return 'fail'
 
+#用户签名+时间戳
+def sign_user(request):
+    if request.method == 'POST':
+        client_time = request.POST.get('time', '')
+        client_sign = request.POST.get('sign', '')
+    else:
+        client_time = request.GET.get('time', '')
+        client_sign = request.GET.get('sign', '')
+    if client_time == '' or client_sign == '':
+        return 'sign null'
+    print(client_time)
+    #服务器时间
+    server_time = datetime.now().timestamp()
+    #获取时间差
+    try:
+        time_difference = server_time - float(client_time)
+    except ValueError:
+        print(server_time)
+        print(client_time)
+
+    if time_difference > 60:
+        return 'timeout'
+
+    #签名检查
+    md5 = hashlib.md5()
+    str_sign = (str(client_time) + "&Guest-Bugmaster").encode('utf8')
+    md5.update(str_sign)
+    server_sign = md5.hexdigest()
+    if server_sign != client_sign:
+        return 'sign error'
+    else:
+        return 'sign right'
 #添加发布会接口
 def add_event(request):
+    user_sign_result = sign_user(request)
+    if user_sign_result == 'sign null':
+        return JsonResponse({'status': 20011, 'message': 'sign null'})
+    elif user_sign_result == 'timeout':
+        return JsonResponse({'status': 20012, 'message': 'the time is not available'})
+    elif user_sign_result == 'sign error':
+        return JsonResponse({'status': 20013, 'message': 'sign error'})
     auth_result = user_auth(request)
     if auth_result == 'null':
         return JsonResponse({'status': 10011, 'message': 'user auth is null'})
@@ -40,7 +79,6 @@ def add_event(request):
     if result:
         return JsonResponse({'status': 10022, 'message': 'event id already exists'})
     result = Event.objects.filter(name=name)
-    print(start_time)
     if result:
         return JsonResponse({'status': 10023, 'message': 'event name already exists'})
     if status == '':
@@ -56,7 +94,26 @@ def add_event(request):
 
 #发布会查询接口
 def get_event_list(request):
-    print("===========================")
+    user_sign_result = sign_user(request)
+    if user_sign_result == 'sign null':
+        return JsonResponse({'status': 20011, 'message': 'sign null'})
+    elif user_sign_result == 'timeout':
+        return JsonResponse({'status': 20022, 'message': 'the time is not available'})
+    elif user_sign_result == 'sign error':
+        return JsonResponse({'status': 20023, 'message': 'sign error'})
+    auth_result = user_auth(request)
+    if auth_result == 'null':
+        return JsonResponse({'status': 10011, 'message': 'user auth is null'})
+    elif auth_result == 'fail':
+        return JsonResponse({'status': 10012, 'message': 'user auth is wrong'})
+    user_sign_result = user_sign(request)
+    print(user_sign_result)
+    if user_sign_result == 'sign null':
+        return JsonResponse({'status': 20011, 'message': 'sign null'})
+    elif user_sign_result == 'timeout':
+        return JsonResponse({'status': 20022, 'message': 'the time is not available'})
+    elif user_sign_result == 'sign error':
+        return JsonResponse({'status': 20023, 'message': 'sign error'})
     auth_result = user_auth(request)
     if auth_result == 'null':
         return JsonResponse({'status': 10011, 'message': 'user auth is null'})
@@ -65,7 +122,7 @@ def get_event_list(request):
     eid = request.GET.get('eid', '')
     name = request.GET.get('name', '')
     if eid == '' and name == '':
-        return JsonResponse({'status': 10021, 'message': 'parameter22 error'})
+        return JsonResponse({'status': 10021, 'message': 'parameter error'})
     if eid != '':
         event = {}
         try:
@@ -100,6 +157,18 @@ def get_event_list(request):
 
 #添加嘉宾
 def add_guest(request):
+    user_sign_result = sign_user(request)
+    if user_sign_result == 'sign null':
+        return JsonResponse({'status': 20011, 'message': 'sign null'})
+    elif user_sign_result == 'timeout':
+        return JsonResponse({'status': 20022, 'message': 'the time is not available'})
+    elif user_sign_result == 'sign error':
+        return JsonResponse({'status': 20023, 'message': 'sign error'})
+    auth_result = user_auth(request)
+    if auth_result == 'null':
+        return JsonResponse({'status': 10011, 'message': 'user auth is null'})
+    elif auth_result == 'fail':
+        return JsonResponse({'status': 10012, 'message': 'user auth is wrong'})
     eid = request.POST.get('eid', '')
     realname = request.POST.get('realname', '')
     phone = request.POST.get('phone', '')
@@ -138,6 +207,18 @@ def add_guest(request):
 
 #嘉宾查询接口
 def get_guest_list(request):
+    user_sign_result = sign_user(request)
+    if user_sign_result == 'sign null':
+        return JsonResponse({'status': 20011, 'message': 'sign null'})
+    elif user_sign_result == 'timeout':
+        return JsonResponse({'status': 20022, 'message': 'the time is not available'})
+    elif user_sign_result == 'sign error':
+        return JsonResponse({'status': 20023, 'message': 'sign error'})
+    auth_result = user_auth(request)
+    if auth_result == 'null':
+        return JsonResponse({'status': 10011, 'message': 'user auth is null'})
+    elif auth_result == 'fail':
+        return JsonResponse({'status': 10012, 'message': 'user auth is wrong'})
     eid = request.GET.get('eid', '')
     phone = request.GET.get('phone', '')
     if eid == '':
@@ -175,6 +256,18 @@ def get_guest_list(request):
 
 #签到接口
 def user_sign(request):
+    user_sign_result = sign_user(request)
+    if user_sign_result == 'sign null':
+        return JsonResponse({'status': 20011, 'message': 'sign null'})
+    elif user_sign_result == 'timeout':
+        return JsonResponse({'status': 20022, 'message': 'the time is not available'})
+    elif user_sign_result == 'sign error':
+        return JsonResponse({'status': 20023, 'message': 'sign error'})
+    auth_result = user_auth(request)
+    if auth_result == 'null':
+        return JsonResponse({'status': 10011, 'message': 'user auth is null'})
+    elif auth_result == 'fail':
+        return JsonResponse({'status': 10012, 'message': 'user auth is wrong'})
     phone = request.POST.get('phone', '')
     eid = request.POST.get('eid', '')
     if eid == '' or phone == '':

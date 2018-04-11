@@ -21,6 +21,11 @@ urlpatterns = [
     url(r'^add_guest/', views_if.add_guest),
     url(r'^get_guest_list/', views_if.get_guest_list),
     url(r'^user_sign/', views_if.user_sign),
+    #加密接口配置
     url(r'^add_event_sec/', views_if_sec.add_event),
     url(r'^get_event_list_sec/', views_if_sec.get_event_list),
+    url(r'^add_guest_sec/', views_if_sec.add_guest),
+    url(r'^get_guest_list_sec/', views_if_sec.get_guest_list),
+    url(r'^user_sign_sec/', views_if_sec.user_sign),
+
 ]
