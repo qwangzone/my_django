@@ -32,15 +32,11 @@ def sign_user(request):
     if client_time == '' or client_sign == '':
         return 'sign null'
     print(client_time)
+    print(client_sign)
     #服务器时间
     server_time = datetime.now().timestamp()
     #获取时间差
-    try:
-        time_difference = server_time - float(client_time)
-    except ValueError:
-        print(server_time)
-        print(client_time)
-
+    time_difference = server_time - float(client_time)
     if time_difference > 60:
         return 'timeout'
 

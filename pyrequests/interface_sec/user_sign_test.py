@@ -2,11 +2,12 @@ import os, sys, requests, unittest
 dir = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(dir)
 from db_fixture import test_data
+from my_unit import MyUnit
 from parameterized import parameterized
-class UserSignTest(unittest.TestCase):
+class UserSignTest(MyUnit):
     '''嘉宾签到测试'''
     def setUp(self):
-        self.base_url = 'http://127.0.0.1:8000/api/user_sign/'
+        self.base_url = 'http://127.0.0.1:8000/api/user_sign_sec/'
 
     @parameterized.expand([('eid_null', '', '13511001101', 10021, 'parameter error'),
                            ('phone_null', '1', '', 10021, 'parameter error'),
@@ -18,8 +19,9 @@ class UserSignTest(unittest.TestCase):
                            ('user_signed', '5', '13511001103', 10027, 'user has sign in'),
                            ('sucess', '5', '13511001102', 200, 'success')])
     def test_user_sign(self, name, eid, phone, status, message):
-        data = {'eid': eid, 'phone': phone}
-        r = requests.request('post', url=self.base_url, data=data)
+        data = {'eid': eid, 'phone': phone, 'time': self.get_client_time, 'sign': self.get_client_sign}
+        auth_data = ('admin', 'admin123456')
+        r = requests.request('post', url=self.base_url, data=data, auth=auth_data)
         self.result = r.json()
         self.assertEqual(self.result['status'], status)
         self.assertIn(message, self.result['message'])

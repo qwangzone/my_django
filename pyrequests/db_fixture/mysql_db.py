@@ -26,8 +26,8 @@ class DB:
     def clear(self, table_name):
         real_sql = "delete from %s;" % table_name
         with self.conn.cursor() as cursor:
-            cursor.execute("SET FOREIGN_KEY_CHECKS=0;")
-            cursor.execute(real_sql)
+                cursor.execute("SET FOREIGN_KEY_CHECKS=0;")
+                cursor.execute(real_sql)
         self.conn.commit()
 
     def insert(self, table_name, table_data):
